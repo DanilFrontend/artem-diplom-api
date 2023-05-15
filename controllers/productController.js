@@ -18,11 +18,11 @@ const cloudinary = require('cloudinary').v2;
 class productController {
 	async create(req, res, next) {
 		try {
-			const { name, price, brandId, typeId, info, fileName } = req.body;
-			// const { img } = req.files;
+			const { name, price, brandId, typeId, info } = req.body;
+			 const { img } = req.files;
 
-			// let fileName = uuidv4() + '.jpg'; // generate uniq filename
-			// img.mv(path.resolve(__dirname, '..', 'static', fileName)); // move file in a static folder, * __dirname - current loication, next params - path to static folder *
+			 let fileName = uuidv4() + '.jpg'; // generate uniq filename
+			 img.mv(path.resolve(__dirname, '..', 'static', fileName)); // move file in a static folder, * __dirname - current loication, next params - path to static folder *
 
 			const product = await Product.create({
 				name,
@@ -84,28 +84,20 @@ class productController {
 			let {
 				brandId,
 				typeId,
-				limit,
-				page,
 				minPrice,
 				maxPrice,
 				sizeId,
 				order,
 			} = req.query;
 
-			page = page || 1;
-			limit = limit || 10;
 			minPrice = minPrice || 0;
 			maxPrice = maxPrice || 100000;
 			order = order || 'priceDESC';
-
-			let offset = limit * page - limit;
 
 			let products;
 
 			if (!brandId && !typeId) {
 				products = await Product.findAndCountAll({
-					limit,
-					offset,
 					distinct: 'id',
 					order: [
 						order === 'priceDESC'
@@ -118,24 +110,7 @@ class productController {
 					],
 					include: [
 						{ model: Type },
-						{ model: Brand },
-						{
-							model: ProductSize,
-							as: 'sizes',
-							include: {
-								model: Sizes,
-							},
-							where: {
-								count: {
-									[Op.gt]: 0,
-								},
-								sizeId: {
-									[sizeId ? Op.eq : Op.gt]: sizeId
-										? sizeId
-										: 0,
-								},
-							},
-						},
+						{ model: ProductInfo },
 					],
 					where: {
 						price: {
@@ -377,14 +352,11 @@ class productController {
 			let fileName = uuidv4() + '.jpg';
 			img.mv(path.resolve(__dirname, '..', 'static', fileName));
 
-			cloudinary.uploader.upload(
-				path.resolve(__dirname, '..', 'static', fileName),
-				function (error, result) {
-					return res.json(result.url);
-				},
-			);
+			return fileName
 		} catch (error) {
+			console.log(error)
 			return next(apiError.internal(error));
+
 		}
 	}
 
