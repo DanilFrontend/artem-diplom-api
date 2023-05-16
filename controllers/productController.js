@@ -110,7 +110,7 @@ class productController {
 					],
 					include: [
 						{ model: Type },
-						{ model: ProductInfo },
+						{ model: ProductInfo, as: 'info' },
 					],
 					where: {
 						price: {
@@ -139,29 +139,9 @@ class productController {
 					],
 					include: [
 						{ model: Type },
-						{ model: Brand },
-
-						{
-							model: ProductSize,
-							as: 'sizes',
-							include: {
-								model: Sizes,
-							},
-							where: {
-								count: {
-									[Op.gt]: 0,
-								},
-								sizeId: {
-									[sizeId ? Op.eq : Op.gt]: sizeId
-										? sizeId
-										: 0,
-								},
-							},
-						},
+						{ model: ProductInfo, as: 'info' },
 					],
 					distinct: 'id',
-					limit,
-					offset,
 				});
 			}
 
@@ -184,28 +164,9 @@ class productController {
 					],
 					include: [
 						{ model: Type },
-						{ model: Brand },
-						{
-							model: ProductSize,
-							as: 'sizes',
-							include: {
-								model: Sizes,
-							},
-							where: {
-								count: {
-									[Op.gt]: 0,
-								},
-								sizeId: {
-									[sizeId ? Op.eq : Op.gt]: sizeId
-										? sizeId
-										: 0,
-								},
-							},
-						},
+						{ model: ProductInfo, as: 'info' },
 					],
 					distinct: 'id',
-					limit,
-					offset,
 				});
 			}
 
@@ -229,28 +190,9 @@ class productController {
 					],
 					include: [
 						{ model: Type },
-						{ model: Brand },
-						{
-							model: ProductSize,
-							as: 'sizes',
-							include: {
-								model: Sizes,
-							},
-							where: {
-								count: {
-									[Op.gt]: 0,
-								},
-								sizeId: {
-									[sizeId ? Op.eq : Op.gt]: sizeId
-										? sizeId
-										: 0,
-								},
-							},
-						},
+						{ model: ProductInfo, as: 'info' },
 					],
 					distinct: 'id',
-					limit,
-					offset,
 				});
 			}
 
