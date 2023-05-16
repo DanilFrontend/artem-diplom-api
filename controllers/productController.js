@@ -70,7 +70,7 @@ class productController {
 						'%' + query + '%',
 					),
 				},
-				include: [{ model: Type }, { model: Brand }, { model: Rating }],
+				include: [{ model: Type }, { model: Brand }, { model: ProductInfo, as: 'info' },],
 			});
 
 			return res.json(products);
