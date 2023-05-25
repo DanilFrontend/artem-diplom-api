@@ -17,6 +17,6 @@ router.post(
 	productController.checkRatingAccess,
 );
 router.get('/info', productController.getProductInfo);
-router.post('/delete', authMiddleware, productController.deleteProduct);
+router.delete('/delete', authMiddleware, productController.deleteProduct);
 
 module.exports = router;
