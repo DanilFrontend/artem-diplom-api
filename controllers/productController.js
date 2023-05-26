@@ -326,7 +326,7 @@ class productController {
 
 	async getProductInfo(req, res, next) {
 		try {
-			const { productId } = req.params;
+			const {productId} = req.body;
 
 			const productInfo = await ProductInfo.findAll({
 				where: { productId },
