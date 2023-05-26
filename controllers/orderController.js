@@ -12,48 +12,40 @@ const {
 } = require('../models/models');
 const { literal } = require('sequelize');
 const apiError = require('../error/apiError');
+const nodemailer = require("nodemailer")
+
+
 
 class orderController {
 	async create(req, res, next) {
 		try {
-			const order = await Order.create({ userId: req.user.id });
-			const orderItems = await BasketProduct.findAll({
-				where: { basketId: req.user.id },
-			});
-
-			orderItems.forEach(element => {
-				ProductSize.update(
-					{ count: literal('count - 1') },
-					{
-						where: {
-							productId: element.productId,
-							sizeId: element.sizeId,
-						},
-					},
-				);
-
-				OrderProducts.create({
-					orderId: order.id,
-					productId: element.productId,
-					sizeId: element.sizeId,
-				});
-			});
-
-			const basket = await Basket.findOne({
-				where: {
-					userId: req.user.id,
+			const {price, address} = req.body;
+			let transporter = nodemailer.createTransport({
+				host: "smtp.yandex.ru",
+				port: 465,
+				secure: true, // true for 465, false for other ports
+				auth: {
+					user: "yocky.mai@yandex.ru", // generated ethereal user
+					pass: process.env.MAIL_PASS, // generated ethereal password
 				},
 			});
 
-			console.log(basket);
 
-			BasketProduct.destroy({
-				where: {
-					basketId: basket.id,
-				},
+			// const {date, location, price, products} = req.data;
+			const {email} = req.user;
+
+			let info = await transporter.sendMail({
+				from: '"Food 👻" <yocky.mai@yandex.ru>', // sender address
+				to: email, // list of receivers
+				subject: "Заказ успешно создан! ✔", // Subject line
+				text: `Ваш заказ на сумму ${price}руб. успешно создан!`, // plain text body
 			});
 
-			return res.json({ status: 'ok' });
+			console.log("Message sent: %s", info.messageId);
+			// Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+			// Preview only available when sending through an Ethereal account
+			console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 		} catch (error) {
 			console.log(error);
 		}
