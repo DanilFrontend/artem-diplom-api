@@ -72,13 +72,18 @@ const Order = sequelize.define('order', {
 });
 
 const OrderProducts = sequelize.define('order_products', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+	id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 });
 
 const Comment = sequelize.define('comment', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	value: { type: DataTypes.TEXT, require: true },
+	id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+	value: {type: DataTypes.TEXT, require: true},
 });
+
+const Review = sequelize.define('review', {
+	id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+	value: {type: DataTypes.TEXT, allowNull: false}
+})
 
 User.hasMany(Comment);
 Product.hasMany(Comment);
@@ -120,15 +125,18 @@ BasketProduct.belongsTo(Product);
 Product.hasMany(ProductInfo, { as: 'info' });
 Product.belongsTo(ProductInfo);
 
-Product.hasMany(ProductSize, { as: 'sizes' });
+Product.hasMany(ProductSize, {as: 'sizes'});
 
 ProductSize.belongsTo(Sizes);
 
 Product.hasMany(Rating);
 Rating.belongsTo(Product);
 
-Type.belongsToMany(Brand, { through: TypeBrand });
-Brand.belongsToMany(Type, { through: TypeBrand });
+Type.belongsToMany(Brand, {through: TypeBrand});
+Brand.belongsToMany(Type, {through: TypeBrand});
+
+User.hasMany(Review);
+Review.belongsTo(User);
 
 module.exports = {
 	User,
@@ -145,4 +153,5 @@ module.exports = {
 	Order,
 	OrderProducts,
 	Comment,
+	Review
 };
