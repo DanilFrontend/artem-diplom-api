@@ -8,9 +8,10 @@ router.post('/uploadimage', productController.uploadImage);
 router.post('/updateimage', productController.updateImage);
 router.get('/search', productController.getAllByTextSearch);
 router.post('/', productController.create);
+router.post('/edit', productController.edit);
 router.get('/', productController.getAll);
+router.get('/getAll', productController.getAllProducts);
 router.get('/:id', productController.getOne);
-router.post('/rating', authMiddleware, productController.addRating);
 router.post(
 	'/rating/check/:productId',
 	authMiddleware,

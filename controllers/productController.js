@@ -16,9 +16,47 @@ const { group } = require('console');
 const cloudinary = require('cloudinary').v2;
 
 class productController {
+	async edit(req, res, next) {
+		try {
+			const { productId ,name, price, typeId, info } = req.body;
+
+			const product = await Product.findOne({
+				where: {
+					id: productId
+				}
+			});
+			product.name = name;
+			product.price = price;
+			product.typeId = typeId;
+
+			await product.save();
+
+			if (info) {
+				await ProductInfo.destroy({
+					where: {
+						productId: product.id,
+					},
+				});
+
+				const parsedInfo = JSON.parse(info);
+				parsedInfo.forEach(infoEl => {
+					ProductInfo.create({
+						title: infoEl.title,
+						description: infoEl.description,
+						productId: product.id,
+					});
+				});
+			}
+
+			return res.json(product);
+		} catch (error) {
+			console.log(error);
+			next(apiError.badRequest(error.message));
+		}
+	}
 	async create(req, res, next) {
 		try {
-			const { name, price, brandId, typeId, info } = req.body;
+			const { name, price, typeId, info } = req.body;
 			 const { img } = req.files;
 
 			 let fileName = uuidv4() + '.jpg'; // generate uniq filename
@@ -27,7 +65,6 @@ class productController {
 			const product = await Product.create({
 				name,
 				price,
-				brandId,
 				typeId,
 				img: fileName,
 			});
@@ -52,17 +89,12 @@ class productController {
 
 	async getAllByTextSearch(req, res) {
 		try {
-			let { query, sector } = req.query;
+			let { query } = req.query;
 
-			sector = sector || 1;
 			query = query.toLowerCase();
 
-			let limit = 10;
-			let offset = limit * sector - limit;
 
 			const products = await Product.findAll({
-				limit,
-				offset,
 				where: {
 					name: Sequelize.where(
 						Sequelize.fn('LOWER', Sequelize.col('product.name')),
@@ -79,6 +111,17 @@ class productController {
 		}
 	}
 
+	async getAllProducts(req, res, next) {
+		const products = await Product.findAll({
+			include: [
+				{ model: Type },
+				{ model: ProductInfo, as: 'info' },
+			],
+		});
+
+		return res.json({rows: products});
+	}
+
 	async getAll(req, res, next) {
 		try {
 			let {
@@ -86,7 +129,6 @@ class productController {
 				typeId,
 				minPrice,
 				maxPrice,
-				sizeId,
 				order,
 			} = req.query;
 
@@ -117,7 +159,7 @@ class productController {
 							[Op.between]: [minPrice, maxPrice],
 						},
 					},
-				}); // resposing all counts of products
+				});
 			}
 
 			if (brandId && !typeId) {
@@ -200,43 +242,6 @@ class productController {
 		} catch (error) {
 			next(apiError.badRequest(error.message));
 			console.log(error);
-		}
-	}
-
-	async addRating(req, res, next) {
-		try {
-			const { rate, productId } = req.body;
-
-			const candidate = await Rating.findOne({
-				where: {
-					userId: req.user.id,
-					productId,
-				},
-			});
-
-			if (candidate) {
-				return next(apiError.internal('Оценка уже поставлена'));
-			}
-
-			const rating = await Rating.create({
-				userId: req.user.id,
-				productId,
-				rate,
-			});
-
-			const count = await Rating.count({ where: { productId } });
-			const sum = await Rating.sum('rate', { where: { productId } });
-
-			const updatedRating = sum / count;
-
-			Product.update(
-				{ rating: updatedRating },
-				{ where: { id: productId } },
-			);
-
-			return res.json({ status: 'ok' });
-		} catch (error) {
-			next(apiError.badRequest(error.message));
 		}
 	}
 
