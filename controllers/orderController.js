@@ -19,7 +19,7 @@ const nodemailer = require("nodemailer")
 class orderController {
 	async create(req, res, next) {
 		try {
-			const {price, address} = req.body;
+			const {price, address, time} = req.body;
 			let transporter = nodemailer.createTransport({
 				host: "smtp.yandex.ru",
 				port: 465,
@@ -35,10 +35,10 @@ class orderController {
 			const {email} = req.user;
 
 			let info = await transporter.sendMail({
-				from: '"Food 👻" <yocky.mai@yandex.ru>', // sender address
+				from: '"Своя компания!" 👻" <yocky.mai@yandex.ru>', // sender address
 				to: email, // list of receivers
 				subject: "Заказ успешно создан! ✔", // Subject line
-				text: `Ваш заказ на сумму ${price}руб. успешно создан!`, // plain text body
+				text: `Ваш заказ на сумму ${price}руб. успешно создан! Он будет дожитаться вас на ${address} в ${time}`, // plain text body
 			});
 
 			console.log("Message sent: %s", info.messageId);
