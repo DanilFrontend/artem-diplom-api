@@ -245,27 +245,6 @@ class productController {
 		}
 	}
 
-	async checkRatingAccess(req, res, next) {
-		try {
-			const { productId } = req.params;
-
-			const candidate = await Rating.findOne({
-				where: {
-					userId: req.user.id,
-					productId,
-				},
-			});
-
-			if (candidate) {
-				return next(apiError.internal('Оценка уже поставлена'));
-			}
-
-			return res.json('ok');
-		} catch (error) {
-			next(apiError.badRequest(error.message));
-		}
-	}
-
 	async getOne(req, res, next) {
 		try {
 			const { id } = req.params;
@@ -288,43 +267,6 @@ class productController {
 
 			return res.json(product);
 		} catch (error) {
-			next(apiError.badRequest(error.message));
-		}
-	}
-
-	async uploadImage(req, res, next) {
-		try {
-			const { img } = req.files;
-
-			let fileName = uuidv4() + '.jpg';
-			img.mv(path.resolve(__dirname, '..', 'static', fileName));
-
-			return fileName
-		} catch (error) {
-			console.log(error)
-			return next(apiError.internal(error));
-
-		}
-	}
-
-	async updateImage(req, res, next) {
-		try {
-			const { productId, fileName } = req.body;
-
-			const product = await Product.update(
-				{
-					img: fileName,
-				},
-				{
-					where: {
-						id: productId,
-					},
-				},
-			);
-
-			return res.json(product);
-		} catch (error) {
-			console.log(error);
 			next(apiError.badRequest(error.message));
 		}
 	}

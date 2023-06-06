@@ -38,7 +38,7 @@ class orderController {
 				from: '"Своя компания!" 👻" <yocky.mai@yandex.ru>', // sender address
 				to: email, // list of receivers
 				subject: "Заказ успешно создан! ✔", // Subject line
-				text: `Ваш заказ на сумму ${price}руб. успешно создан! Он будет дожитаться вас на ${address} в ${time}`, // plain text body
+				text: `Ваш заказ на сумму ${price}руб. успешно создан! Он будет дожитаться вас на адресе ${address} в ${time}`, // plain text body
 			});
 
 			console.log("Message sent: %s", info.messageId);
