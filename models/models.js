@@ -9,14 +9,6 @@ const User = sequelize.define('user', {
 	role: { type: DataTypes.STRING, defaultValue: 'USER' },
 });
 
-const Basket = sequelize.define('basket', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-});
-
-const BasketProduct = sequelize.define('basket_product', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-});
-
 const Product = sequelize.define('product', {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 	name: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -41,43 +33,8 @@ const Brand = sequelize.define('brand', {
 	name: { type: DataTypes.STRING, unique: false, allowNull: false },
 });
 
-const Rating = sequelize.define('rating', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	rate: { type: DataTypes.REAL, allowNull: false },
-});
-
 const TypeBrand = sequelize.define('type_brand', {
 	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-});
-
-const ProductSize = sequelize.define('product_size', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	count: { type: DataTypes.INTEGER, defaultValue: 0 },
-});
-
-const Sizes = sequelize.define(
-	'sizes',
-	{
-		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-		size: { type: DataTypes.INTEGER, unique: true, allowNull: false },
-	},
-	{
-		timestamps: false,
-	},
-);
-
-const Order = sequelize.define('order', {
-	id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-	status: { type: DataTypes.STRING, defaultValue: 'active' },
-});
-
-const OrderProducts = sequelize.define('order_products', {
-	id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-});
-
-const Comment = sequelize.define('comment', {
-	id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-	value: {type: DataTypes.TEXT, require: true},
 });
 
 const Review = sequelize.define('review', {
@@ -85,52 +42,14 @@ const Review = sequelize.define('review', {
 	value: {type: DataTypes.TEXT, allowNull: false}
 })
 
-User.hasMany(Comment);
-Product.hasMany(Comment);
-Comment.belongsTo(User);
-Comment.belongsTo(Product);
-
-Product.hasMany(OrderProducts);
-OrderProducts.belongsTo(Product);
-
-Sizes.hasMany(OrderProducts);
-OrderProducts.belongsTo(Sizes);
-
-Order.hasMany(OrderProducts);
-OrderProducts.belongsTo(Order);
-
-User.hasMany(Order);
-Order.belongsTo(User);
-
-BasketProduct.belongsTo(Sizes);
-
-User.hasOne(Basket);
-Basket.belongsTo(User);
-
-User.hasMany(Rating);
-Rating.belongsTo(User);
-
-Basket.hasMany(BasketProduct);
-BasketProduct.belongsTo(Basket);
-
 Type.hasMany(Product);
 Product.belongsTo(Type);
 
 Brand.hasMany(Product);
 Product.belongsTo(Brand);
 
-Product.hasMany(BasketProduct);
-BasketProduct.belongsTo(Product);
-
 Product.hasMany(ProductInfo, { as: 'info' });
 Product.belongsTo(ProductInfo);
-
-Product.hasMany(ProductSize, {as: 'sizes'});
-
-ProductSize.belongsTo(Sizes);
-
-Product.hasMany(Rating);
-Rating.belongsTo(Product);
 
 Type.belongsToMany(Brand, {through: TypeBrand});
 Brand.belongsToMany(Type, {through: TypeBrand});
@@ -140,18 +59,10 @@ Review.belongsTo(User);
 
 module.exports = {
 	User,
-	Basket,
-	BasketProduct,
 	Product,
 	ProductInfo,
 	Type,
 	Brand,
-	Rating,
 	TypeBrand,
-	Sizes,
-	ProductSize,
-	Order,
-	OrderProducts,
-	Comment,
 	Review
 };
